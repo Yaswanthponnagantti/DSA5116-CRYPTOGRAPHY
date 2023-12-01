@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define ALPHABET_SIZE 26
+void count_letter_frequencies(unsigned char *ciphertext, int *frequencies) {
+    for (int i = 0; ciphertext[i] != '\0'; i++) {
+        frequencies[ciphertext[i] - 'A']++;
+    }
+}
+void find_most_frequent_letters(unsigned char *ciphertext, int *frequencies, unsigned char *most_frequent_letters) {
+    int max_frequency = 0;
+    int second_max_frequency = 0;
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        if (frequencies[i] > max_frequency) {
+            second_max_frequency = max_frequency;
+            max_frequency = frequencies[i];
+            most_frequent_letters[0] = i + 'A';
+        } else if (frequencies[i] > second_max_frequency) {
+            second_max_frequency = frequencies[i];
+            most_frequent_letters[1] = i + 'A';
+        }
+    }
+}
+void decrypt_affine_cipher(unsigned char *ciphertext, unsigned char *plaintext, int a, int b) {
+    for (int i = 0; ciphertext[i] != '\0'; i++) {
+        int plaintext_index = (ciphertext[i] - 'A' - b) % ALPHABET_SIZE;
+        if (plaintext_index < 0) {
+            plaintext_index += ALPHABET_SIZE;
+        }
+        plaintext[i] = (plaintext_index * a) % ALPHABET_SIZE + 'A';
+    }
+}
+int main() {
+    unsigned char ciphertext[100];
+    unsigned char plaintext[100];
+    unsigned char most_frequent_letters[2];
+    int frequencies[ALPHABET_SIZE];
+    printf("Enter the ciphertext: ");
+    scanf("%s", ciphertext);
+    count_letter_frequencies(ciphertext, frequencies);
+    find_most_frequent_letters(ciphertext, frequencies, most_frequent_letters);
+    if (most_frequent_letters[0] == 'B' && most_frequent_letters[1] == 'U') {
+        decrypt_affine_cipher(ciphertext, plaintext, 3, 15);
+        printf("Plaintext: %s\n", plaintext);
+    } else {
+        printf("Unable to break the cipher using the given assumption.\n");
+    }
+    return 0;
+}
